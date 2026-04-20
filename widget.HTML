@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta name="js-widget-title" content="Webcam Orologio della Costa">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: #000;
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      font-family: -apple-system, sans-serif;
+    }
+    #cam {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    #overlay {
+      position: absolute;
+      bottom: 6px;
+      right: 8px;
+      color: rgba(255,255,255,0.7);
+      font-size: 10px;
+      background: rgba(0,0,0,0.4);
+      padding: 2px 5px;
+      border-radius: 4px;
+    }
+    #status {
+      position: absolute;
+      top: 6px;
+      left: 8px;
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #4caf50;
+    }
+  </style>
+</head>
+<body>
+  <img id="cam" src="" alt="webcam">
+  <div id="status"></div>
+  <div id="overlay" id="ts">--:--</div>
+
+  <script>
+    var ALIAS = '679763c666103';
+    var INTERVAL = 10000;
+    var img = document.getElementById('cam');
+    var ts = document.getElementById('overlay');
+    var dot = document.getElementById('status');
+
+    function pad(n) { return n < 10 ? '0' + n : n; }
+
+    function updateTime() {
+      var d = new Date();
+      ts.textContent = pad(d.getHours()) + ':' + pad(d.getMinutes()) + ':' + pad(d.getSeconds());
+    }
+
+    function loadSnapshot() {
+      var url = 'https://g0.ipcamlive.com/player/snapshot.php?alias=' + ALIAS + '&t=' + Date.now();
+      var tmp = new Image();
+      tmp.onload = function() {
+        img.src = tmp.src;
+        dot.style.background = '#4caf50';
+        updateTime();
+      };
+      tmp.onerror = function() {
+        dot.style.background = '#f44336';
+      };
+      tmp.src = url;
+    }
+
+    function __wweb2WaitMillisecondsToWidgetIsReady(currentDelayMs) {
+      return img.complete && img.src ? 0 : 2000;
+    }
+
+    loadSnapshot();
+    setInterval(loadSnapshot, INTERVAL);
+    setInterval(updateTime, 1000);
+  </script>
+</body>
+</html>
